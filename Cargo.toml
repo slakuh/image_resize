@@ -1,0 +1,18 @@
+[package]
+name = "image_resize"
+version = "0.1.0"
+authors = ["skuhinek@gmail.com <skuhinek@gmail.com>"]
+
+[dependencies]
+clap = "2.24.2"
+image = "0.13.0"
+
+[dependencies.user]
+path = "../user"
+
+[dependencies.pause]
+path = "../pause"
+
+[profile.release]
+lto = true
+panic = "abort"
