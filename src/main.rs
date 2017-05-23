@@ -5,6 +5,7 @@ extern crate user;
 
 mod arguments;
 mod job;
+mod resize;
 
 use arguments::{Arguments};
 

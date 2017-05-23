@@ -11,8 +11,8 @@ const FILTERS: [&str; 5] = ["nn", "lf", "cf", "gf", "l"];
 const RESIZE_TYPE: [&str; 4] = ["inc", "dec", "non", "iod"];
 
 pub struct Arguments {
-    job: Job,
-    images: Vec<PathBuf>,
+    pub job: Job,
+    pub images: Vec<PathBuf>,
 }
 
 impl Arguments {
@@ -90,7 +90,7 @@ impl Arguments {
         if let Some(width) = matches.value_of("width") {
             match width.parse::<u32>() {
                 Ok(w) => job.change_width(w),
-                Err(_) => println!("Value \"{}\" for image WIDTH isn't number\n.\
+                Err(_) => println!("Value \"{}\" for image WIDTH isn't number. \
                 Using a default value \"{}\".", width, job.width),
             }
         } 
@@ -98,12 +98,13 @@ impl Arguments {
         if let Some(height) = matches.value_of("height") {
             match height.parse::<u32>() {
                 Ok(h) => job.change_height(h),
-                Err(_) => println!("Value \"{}\" for image HEIGHT isn't number.\n. \
+                Err(_) => println!("Value \"{}\" for image HEIGHT isn't number. \
                 Using a default value \"{}\".", height, job.height),
             }
         } 
 
         if let Some(format) = matches.value_of("format") {
+            //pause::print(format!("{}",format));
             //println!("{}", format);
             match format {
                 "jpg" => job.change_format(Format::Jpeg),
@@ -123,7 +124,18 @@ impl Arguments {
                 _ => unreachable!("while matching filters in Arguments::job_from_clap()"),
             }
         } 
-        // pause::print(job.height);
+
+        if let Some(resize) = matches.value_of("resize") {
+            //println!("{}", filter);
+            match resize {
+                "inc" => job.change_resize(ResizeType::Increase),
+                "dec" => job.change_resize(ResizeType::Decrease),
+                "non" => job.change_resize(ResizeType::Neither),
+                "iod" => job.change_resize(ResizeType::IncreaseOrDecrease),                               
+                _ => unreachable!("while resize type in Arguments::job_from_clap()"),
+            }
+        }
+        //pause::print(format!("{}, {}", job.width, job.height));
         job
     }
 
