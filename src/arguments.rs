@@ -1,4 +1,4 @@
-use clap::{Arg, App, AppSettings, SubCommand};
+use clap::{Arg, App, AppSettings};
 use image::FilterType;
 use job::{Format, Job, JobBuilder, ResizeType};
 use std::env;
@@ -78,7 +78,7 @@ impl Arguments {
                                     dec - Image size will be decreased but not increased,\n\
                                     non - Image size will stay unchanged, \
                                     can be used for converting to another image format\n\
-                                    iod - Image size will be increased or decreased,\n")
+                                    iod - Image size will be increased or decreased to specified size,\n")
                                     .takes_value(true)
                                     .possible_values(&RESIZE_TYPE))
                                 .get_matches();
@@ -131,7 +131,7 @@ impl Arguments {
                 "inc" => job.change_resize(ResizeType::Increase),
                 "dec" => job.change_resize(ResizeType::Decrease),
                 "non" => job.change_resize(ResizeType::Neither),
-                "iod" => job.change_resize(ResizeType::IncreaseOrDecrease),                               
+                "iod" => job.change_resize(ResizeType::Eather),                               
                 _ => unreachable!("while resize type in Arguments::job_from_clap()"),
             }
         }
@@ -140,7 +140,11 @@ impl Arguments {
     }
 
     pub fn from(builder: JobBuilder) -> Self {
-        unimplemented!();
+        Arguments {
+            job: builder.execute(),
+            images: Arguments::image_paths(),
+        }
+        
     }
 
     fn image_paths() -> Vec<PathBuf> {

@@ -1,6 +1,5 @@
 use image::FilterType;
-// defauktne vrijednosti za Job struct
-const IMAGE_SIZE: u32 = 720;
+// osnovne vrijednosti za Job struct
 const FORMAT: Format = Format::Jpeg;
 const FILTER: FilterType = FilterType::Nearest;
 const RESIZE: ResizeType = ResizeType::Decrease;
@@ -19,16 +18,16 @@ pub enum ResizeType {
     /// neće mjenjati velićinu slike
     Neither,
     /// poovećat će ili smanjiti sliku na zadanu velićinu
-    IncreaseOrDecrease,
+    Eather,
 }
 
 
 pub struct Job {
-    format: Format,
+    pub format: Format,
     pub width: u32,
     pub height: u32,
-    filter: FilterType,
-    resize: ResizeType    
+    pub filter: FilterType,
+    pub resize: ResizeType    
 }
 
 pub struct JobBuilder {
@@ -44,8 +43,8 @@ impl JobBuilder {
     pub fn new() -> Self {
         JobBuilder {
             format: FORMAT,
-            width: IMAGE_SIZE,
-            height: IMAGE_SIZE,
+            width: 0,
+            height: 0,
             filter: FILTER,
             resize: RESIZE,
         }
