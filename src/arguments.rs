@@ -28,7 +28,8 @@ impl Arguments {
         let matches = App::new("\nImage Resize")
                                 .version("0.1.0")
                                 .author("Slaven Kuhinek © 2017")
-                                .about("\nImage Resize je program za smanjivanje fotografija koji korisiti naredbeni redak za unos parametara za promjenu veličine fotografija.")
+                                .about("\nImage Resize je program za smanjivanje fotografija \
+                                koji korisiti naredbeni redak za unos parametara za promjenu veličine fotografija.")
                                 .settings(&[
                                     AppSettings::WaitOnError, 
                                     AppSettings::ColorAlways,
@@ -156,14 +157,11 @@ impl Arguments {
             
             if path.is_file() {
                 let file_extension = path.extension()
-                    .expect("paths_from_arguments").to_str()
-                    .expect("paths_from_arguments").to_lowercase();                
-                    //println!("{:?}", path.clone()); ///////////////////////////////////
+                    .expect("arguments::image_paths()").to_str()
+                    .expect("arguments::image_paths()").to_lowercase();
           
                 for item in &SUPPORTED_IMAGES {
                     if item == &file_extension {
-                        // pause::print("test"); /////////////////////////////////////////
-                        //pause::print(&format!("{:?}", path.clone()));
                         images.push(path.clone());
                         
                     }

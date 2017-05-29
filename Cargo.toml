@@ -6,6 +6,8 @@ authors = ["skuhinek@gmail.com <skuhinek@gmail.com>"]
 [dependencies]
 clap = "~2.24.2"
 image = "0.13.0"
+term = "0.4.5"
+rayon = "0.7.0"
 
 [dependencies.user]
 path = "../user"
@@ -14,5 +16,5 @@ path = "../user"
 path = "../pause"
 
 [profile.release]
-lto = true
-panic = "abort"
+# lto = true
+# panic = "abort"

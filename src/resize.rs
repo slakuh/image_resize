@@ -3,6 +3,7 @@ extern crate image;
 use arguments::Arguments;
 use image::{DynamicImage, GenericImage, ImageError, ImageFormat, ImageResult};
 use job::{Format, Job, ResizeType};
+
 use std::fs::{self, File};
 use std::path::PathBuf;
 
@@ -41,17 +42,13 @@ impl<'a> Resize<'a> {
         let img = self.load_image()?;
         //let is_size_changed = self.calc_sizes();
         if self.calc_sizes() {
-            println!("{} x {}", self.width_new, self.height_new);
             let resized_image = img.resize_exact(self.width_new, self.height_new, self.job.filter);
             let path_new = self.rename_image();
             let ref mut fout = File::create(&path_new).unwrap();
             let _ = resized_image.save(fout, self.image_save_format());
         } else {
-            println!("Didn't resize image.");
+            return Err(ImageError::DimensionError);
         }
-
-
-
        Ok(())
     }
 
@@ -65,11 +62,9 @@ impl<'a> Resize<'a> {
         if self.job.width == 0 && self.job.height == 0 {
             self.width_new = DEFAULT_SIZE;
             self.height_new  = DEFAULT_SIZE; 
-            println!("1");
         }
 
         if self.width_new != 0 && self.height_new != 0 {
-            println!("2");
             if self.width_old > self.height_old {
                 is_size_changed = self.resize_to_width();
             } else {
@@ -84,7 +79,6 @@ impl<'a> Resize<'a> {
         } else {
             unreachable!("Resize::calc_sizes()");
         }
-
         is_size_changed
     }
 
@@ -123,16 +117,11 @@ impl<'a> Resize<'a> {
         }
     }
 
-    // extenzija prema save formatu
+   
     fn rename_image(&self) -> PathBuf {        
         let mut file_stem = self.path.file_stem()
             .expect("Resize::rename_image()").to_str()
             .expect("Resize::rename_image()").to_string();
-            /*
-        let file_extension = self. path.extension()
-            .expect("Resize::rename_image()").to_str()
-            .expect("Resize::rename_image()").to_string();
-        */
         let name = file_stem + SUFFIX + "." + &self.extension();
 
         let mut path_new = self.path.clone();
@@ -149,8 +138,3 @@ impl<'a> Resize<'a> {
     }
 }
 
-
-
-pub fn resize_images(args: &Arguments ) {
-    unimplemented!()
-}
