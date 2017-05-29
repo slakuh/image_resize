@@ -1,10 +1,9 @@
 extern crate image;
 
-use arguments::Arguments;
-use image::{DynamicImage, GenericImage, ImageError, ImageFormat, ImageResult};
+use image::{DynamicImage, GenericImage, ImageError, ImageFormat};
 use job::{Format, Job, ResizeType};
 
-use std::fs::{self, File};
+use std::fs::File;
 use std::path::PathBuf;
 
 const DEFAULT_SIZE: u32 = 1080;
@@ -32,7 +31,7 @@ impl<'a> Resize<'a> {
     }
 
     fn load_image(&mut self) -> Result<DynamicImage, ImageError>{
-        let mut img = image::open(&self.path)?;
+        let img = image::open(&self.path)?;
         self.width_old = img.width();
         self.height_old = img.height();
         Ok(img)
@@ -54,10 +53,8 @@ impl<'a> Resize<'a> {
 
     /// calculates sizes for resizing and returns true if image should be resized
     fn calc_sizes(&mut self) -> bool {
-        let mut is_size_changed = false;
+        let is_size_changed;
 
-        //let mut self.job.width = self.job.width;
-        //let mut self.job.height = self.job.height;
         // dodjeljuje osnovne vrijednosti ako visina i širina nisu zadane                
         if self.job.width == 0 && self.job.height == 0 {
             self.width_new = DEFAULT_SIZE;
@@ -119,7 +116,7 @@ impl<'a> Resize<'a> {
 
    
     fn rename_image(&self) -> PathBuf {        
-        let mut file_stem = self.path.file_stem()
+        let file_stem = self.path.file_stem()
             .expect("Resize::rename_image()").to_str()
             .expect("Resize::rename_image()").to_string();
         let name = file_stem + SUFFIX + "." + &self.extension();

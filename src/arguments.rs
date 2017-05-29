@@ -3,7 +3,6 @@ use image::FilterType;
 use job::{Format, Job, JobBuilder, ResizeType};
 use std::env;
 use std::path::PathBuf;
-use pause;
 
 const SUPPORTED_IMAGES: [&str; 7] = ["jpg", "png", "jpeg", "gif", "bmp", "tif", "tiff"];
 const SUPPORTED_SAVES: [&str; 2] = ["jpg", "png"];
