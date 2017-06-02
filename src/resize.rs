@@ -7,12 +7,14 @@ use std::fs::File;
 use std::path::PathBuf;
 
 const DEFAULT_SIZE: u32 = 1080;
-const SUFFIX: &str = "-m";
+
 
 //#[derive(Default)]
 pub struct Resize<'a> {
-    path: PathBuf,
+    path: &'a PathBuf,
     job: &'a Job,
+    width_original: u32,
+    height_original: u32,
     width_old: u32,
     width_new:u32,
     height_old: u32,
@@ -20,10 +22,12 @@ pub struct Resize<'a> {
 }
 
 impl<'a> Resize<'a> {
-    pub fn new(path: PathBuf, job: &'a Job) -> Self {
+    pub fn new(path: &'a PathBuf, job: &'a Job) -> Self {
         Resize {
             path: path, 
             job: job,
+            width_original: 0,
+            height_original: 0,
             width_old: 0,
             width_new: 0,
             height_old: 0,
@@ -32,6 +36,8 @@ impl<'a> Resize<'a> {
 
     fn load_image(&mut self) -> Result<DynamicImage, ImageError>{
         let img = image::open(&self.path)?;
+        self.width_original= img.width();
+        self.height_original = img.height();
         self.width_old = img.width();
         self.height_old = img.height();
         Ok(img)
@@ -40,15 +46,34 @@ impl<'a> Resize<'a> {
     pub fn resize(&mut self) -> Result<(), ImageError> {
         let img = self.load_image()?;
         //let is_size_changed = self.calc_sizes();
-        if self.calc_sizes() {
+        if self.resize_or_convert() {
             let resized_image = img.resize_exact(self.width_new, self.height_new, self.job.filter);
             let path_new = self.rename_image();
-            let ref mut fout = File::create(&path_new).unwrap();
+            let fout = &mut File::create(&path_new).unwrap();
             let _ = resized_image.save(fout, self.image_save_format());
         } else {
             return Err(ImageError::DimensionError);
         }
        Ok(())
+    }
+
+    /// Images with difrent format that doesn't needs to be resized
+    /// will be converted to seted format (jpg or png).    
+    /// Returns true if image size should be resized or
+    /// converted to another format.
+    fn resize_or_convert(&mut self) -> bool {
+        let mut to_convert = self.calc_sizes();
+        let extension = self.path.extension()
+            .expect("Resize::rename_image()").to_str()
+            .expect("Resize::rename_image()").to_lowercase();
+        // decides to convert another format to a set format (jpg or png)
+        if !to_convert && extension != self.extension() {
+            self.width_new = self.width_original;
+            self.height_new = self.height_original;
+            to_convert = true;
+        }
+
+        to_convert
     }
 
     /// calculates sizes for resizing and returns true if image should be resized
@@ -119,7 +144,7 @@ impl<'a> Resize<'a> {
         let file_stem = self.path.file_stem()
             .expect("Resize::rename_image()").to_str()
             .expect("Resize::rename_image()").to_string();
-        let name = file_stem + SUFFIX + "." + &self.extension();
+        let name = file_stem + &self.job.suffix + "." + &self.extension();
 
         let mut path_new = self.path.clone();
         path_new.set_file_name(&name);

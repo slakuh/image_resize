@@ -32,13 +32,13 @@ impl Arguments {
                                 .settings(&[
                                     AppSettings::WaitOnError, 
                                     AppSettings::ColorAlways,
-                                    AppSettings::AllowExternalSubcommands,
-                                    
+                                    AppSettings::AllowExternalSubcommands,                                    
                                     ])
                                 .arg(Arg::with_name("width")
                                     .short("W")
                                     .long("width")
                                     .value_name("NUMBER")
+                                    .validator(validate_u32)
                                     .help("Sets a width of resized image. \
                                     Image will be resized proportionaly to this value.")
                                     .takes_value(true))
@@ -46,6 +46,7 @@ impl Arguments {
                                     .short("H")
                                     .long("height")
                                     .value_name("NUMBER")
+                                    .validator(validate_u32)
                                     .help("Sets a height of resized image. \
                                     Image will be resized proportionaly to this value.")
                                     .takes_value(true))
@@ -81,61 +82,70 @@ impl Arguments {
                                     iod - Image size will be increased or decreased to specified size,\n")
                                     .takes_value(true)
                                     .possible_values(&RESIZE_TYPE))
+                                .arg(Arg::with_name("suffix")
+                                    .short("s")
+                                    .long("suffix")
+                                    .value_name("STRING")
+                                    .help("Sets a suffix that will be added to a file name of resized image.")
+                                    .takes_value(true))
                                 .get_matches();
 
         
         let mut job = Job::new();
-           
+
+        fn validate_u32(v: String) -> Result<(), String> {
+            match v.parse::<u32>() {
+                Ok(_) => Ok(()),
+                Err(_) => Err(String::from("Value must be a number.")),
+            }
+        }   
 
         if let Some(width) = matches.value_of("width") {
             match width.parse::<u32>() {
-                Ok(w) => job.change_width(w),
-                Err(_) => println!("Value \"{}\" for image WIDTH isn't number. \
-                Using a default value \"{}\".", width, job.width),
+                Ok(w) => job.width = w,
+                Err(_) => unreachable!(),
             }
         } 
 
         if let Some(height) = matches.value_of("height") {
             match height.parse::<u32>() {
-                Ok(h) => job.change_height(h),
-                Err(_) => println!("Value \"{}\" for image HEIGHT isn't number. \
-                Using a default value \"{}\".", height, job.height),
+                Ok(h) => job.height = h,
+                Err(_) => unreachable!(),                
             }
         } 
 
         if let Some(format) = matches.value_of("format") {
-            //pause::print(format!("{}",format));
-            //println!("{}", format);
             match format {
-                "jpg" => job.change_format(Format::Jpeg),
-                "png" => job.change_format(Format::Png),
+                "jpg" => job.format = Format::Jpeg,
+                "png" => job.format = Format::Png,
                 _ => unreachable!("while matching format in Arguments::job_from_clap()"),
             }
         } 
 
         if let Some(filter) = matches.value_of("filter") {
-            //println!("{}", filter);
             match filter {
-                "nn" => job.change_filter(FilterType::Nearest),
-                "lf" => job.change_filter(FilterType::Triangle),
-                "cf" => job.change_filter(FilterType::CatmullRom),
-                "gf" => job.change_filter(FilterType::Gaussian),
-                "l" => job.change_filter(FilterType::Lanczos3),                                
+                "nn" => job.filter = FilterType::Nearest,
+                "lf" => job.filter = FilterType::Triangle,
+                "cf" => job.filter = FilterType::CatmullRom,
+                "gf" => job.filter = FilterType::Gaussian,
+                "l" => job.filter = FilterType::Lanczos3,                                
                 _ => unreachable!("while matching filters in Arguments::job_from_clap()"),
             }
         } 
 
         if let Some(resize) = matches.value_of("resize") {
-            //println!("{}", filter);
             match resize {
-                "inc" => job.change_resize(ResizeType::Increase),
-                "dec" => job.change_resize(ResizeType::Decrease),
-                "non" => job.change_resize(ResizeType::Neither),
-                "iod" => job.change_resize(ResizeType::Eather),                               
+                "inc" => job.resize = ResizeType::Increase,
+                "dec" => job.resize = ResizeType::Decrease,
+                "non" => job.resize = ResizeType::Neither,
+                "iod" => job.resize = ResizeType::Eather,                               
                 _ => unreachable!("while resize type in Arguments::job_from_clap()"),
             }
         }
-        //pause::print(format!("{}, {}", job.width, job.height));
+
+        if let Some(suffix) = matches.value_of("suffix") {
+            job.suffix = suffix.to_string();
+        }
         job
     }
 
@@ -147,8 +157,7 @@ impl Arguments {
         
     }
 
-    fn image_paths() -> Vec<PathBuf> {
-        //pause::pause();
+    fn image_paths() -> Vec<PathBuf> {        
         let mut images: Vec<PathBuf> = Vec::new();
         for argument in env::args().skip(1) {
             

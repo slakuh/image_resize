@@ -3,11 +3,21 @@ use image::FilterType;
 const FORMAT: Format = Format::Jpeg;
 const FILTER: FilterType = FilterType::Nearest;
 const RESIZE: ResizeType = ResizeType::Decrease;
+const SUFFIX: &str = "-m";
 
 /// Izlazni format u kojem će biti spremljena slika
 pub enum Format {
+    // svi podržani formati biti će konvertirani u jpg
     Jpeg,
+    // svi podržani formati biti će konvertirani u png
     Png,
+    // pokušat će sačuvati originalni format, znači png
+    // će biti spremljen kao png,
+    // svi ostali izmjenjeni formati bit će spremljni kao jpg
+    // JpegButKeepPng,
+    // Png je ciljan format, ali će jpeg biti spremljen kao jpeg,
+    // ostali izmijenjeni formati kao png
+    // PngButKeepJpeg,
 }
 
 pub enum ResizeType {
@@ -21,13 +31,14 @@ pub enum ResizeType {
     Eather,
 }
 
-
+// Setings that are applayed for all images
 pub struct Job {
     pub format: Format,
     pub width: u32,
     pub height: u32,
     pub filter: FilterType,
-    pub resize: ResizeType    
+    pub resize: ResizeType,
+    pub suffix: String,
 }
 
 pub struct JobBuilder {
@@ -35,7 +46,8 @@ pub struct JobBuilder {
     width: u32,
     height: u32,
     filter: FilterType,
-    resize: ResizeType
+    resize: ResizeType,
+    suffix: String,
 }
 
 impl JobBuilder {
@@ -47,6 +59,7 @@ impl JobBuilder {
             height: 0,
             filter: FILTER,
             resize: RESIZE,
+            suffix: SUFFIX.to_string(),
         }
     }
 
@@ -73,7 +86,12 @@ impl JobBuilder {
     pub fn resize(&mut self, resize: ResizeType) -> &mut Self {
         self.resize = resize;   
         self
-    }    
+    }
+
+    pub fn suffix(&mut self, suffix: String) -> &mut Self {
+        self.suffix = suffix;
+        self
+    }
 
     pub fn execute(self) -> Job {
         Job {
@@ -82,6 +100,7 @@ impl JobBuilder {
             height: self.height,
             filter: self.filter,
             resize: self.resize,
+            suffix: self.suffix,            
         }
     }      
 }
@@ -89,31 +108,7 @@ impl JobBuilder {
 impl Job {
     /// Kreira new job sa defaultnim vrijednostima
     pub fn new() -> Self {
-        JobBuilder::new().execute()            
+        JobBuilder::new().execute()
     }
-
-    pub fn change_width(&mut self, width: u32) {
-        self.width = width;
-    }
-
-    pub fn change_height(&mut self, height: u32) {
-        self.height = height;
-    }    
-
-    pub fn change_format(&mut self, format: Format) {
-        self.format = format;
-    }    
-
-
-    pub fn change_filter(&mut self, filter: FilterType) {
-        self.filter = filter;
-    }    
-
-    pub fn change_resize(&mut self, resize: ResizeType) {
-        self.resize = resize;
-    }    
-
-
-    
 }
 
