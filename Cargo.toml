@@ -4,11 +4,10 @@ version = "0.1.0"
 authors = ["skuhinek@gmail.com <skuhinek@gmail.com>"]
 
 [dependencies]
-clap = "~2.24.2"
-image = "0.13.0"
-term = "0.4.5"
+clap = "2.25.0"
+image = "0.14.0"
+term = "0.4.6"
 rayon = "0.7.0"
-clippy = {version = "*", optional = true}
 
 [features]
 default = []
@@ -20,5 +19,5 @@ path = "../user"
 path = "../pause"
 
 [profile.release]
-lto = true
-panic = "abort"
+# lto = true !!! NE AKTIVIRATI !!! - sophos av na poslu detektira virus
+# panic = "abort"

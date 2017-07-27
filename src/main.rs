@@ -1,5 +1,3 @@
-#![cfg_attr(feature="clippy", feature(plugin))]
-#![cfg_attr(feature="clippy", plugin(clippy))]
 
 extern crate clap;
 extern crate image;
@@ -25,9 +23,30 @@ fn main() {
 }
 
 pub fn resize_images(args: &Arguments ) {
+/*
+    let mut is_error = false;
 
+    for image in &args.images {        
+        let name = image.file_name()        
+            .expect("main::resize_images()").to_str()
+            .expect("main::resize_images()").to_string();
+        
+        let mut resize = Resize::new(&image, &args.job);
+        if let Err(e) = resize.resize() {
+            is_error = true;
+            match e {
+                //ImageError::DimensionError => error("WARNING", &name, &e, term::color::BRIGHT_YELLOW),
+                ImageError::DimensionError => eprintln!(" WARNING: {} - {}", &name, e),
+                //_ => error("ERROR", &name, &e, term::color::BRIGHT_RED),
+                _ => eprintln!("   ERROR: {} - {}", &name, e),
+            }
+        } else {
+            println!(" resized: {}", &name);
+        }
+    };
+
+*/
     let is_error = AtomicBool::new(false);
-
     args.images.par_iter().for_each(|path| {        
         let name = path.file_name()        
             .expect("main::resize_images()").to_str()
@@ -38,7 +57,9 @@ pub fn resize_images(args: &Arguments ) {
             is_error.store(true, Ordering::Relaxed);
             match e {
                 ImageError::DimensionError => error("WARNING", &name, &e, term::color::BRIGHT_YELLOW),
+                // ImageError::DimensionError => eprintln!(" WARNING: {} - {}", &name, e),
                 _ => error("ERROR", &name, &e, term::color::BRIGHT_RED),
+                // _ => eprintln!("   ERROR: {} - {}", &name, e),
             }
         } else {
             println!(" resized: {}", &name);
@@ -64,3 +85,4 @@ fn error(error: &str, file_name: &str, e: &ImageError, color: u16){
     write!(t, "{}\n\n", e).unwrap();
     t.reset().unwrap();
 }
+

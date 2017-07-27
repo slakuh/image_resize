@@ -25,70 +25,70 @@ impl Arguments {
 
     fn job_from_clap() -> Job {
         let matches = App::new("\nImage Resize")
-                                .version("0.1.0")
-                                .author("Slaven Kuhinek © 2017")
-                                .about("\nImage Resize je program za smanjivanje fotografija \
-                                koji korisiti naredbeni redak za unos parametara za promjenu veličine fotografija.")
-                                .settings(&[
-                                    AppSettings::WaitOnError, 
-                                    AppSettings::ColorAlways,
-                                    AppSettings::AllowExternalSubcommands,                                    
-                                    ])
-                                .arg(Arg::with_name("width")
-                                    .short("W")
-                                    .long("width")
-                                    .value_name("NUMBER")
-                                    .validator(validate_u32)
-                                    .help("Sets a width of resized image. \
-                                    Image will be resized proportionaly to this value.")
-                                    .takes_value(true))
-                                .arg(Arg::with_name("height")
-                                    .short("H")
-                                    .long("height")
-                                    .value_name("NUMBER")
-                                    .validator(validate_u32)
-                                    .help("Sets a height of resized image. \
-                                    Image will be resized proportionaly to this value.")
-                                    .takes_value(true))
-                                .arg(Arg::with_name("format")
-                                    .short("f")
-                                    .long("format")
-                                    .value_name("STRING")
-                                    .help("Sets a format in witch resized image will be saved to a disk. \
-                                    Accepted format are jpg or png.")
-                                    .takes_value(true)
-                                    .possible_values(&SUPPORTED_SAVES))
-                                .arg(Arg::with_name("filter")
-                                    .short("F")
-                                    .long("filter")
-                                    .value_name("STRING")
-                                    .help("Sets an image resize filter. Filters are: \n\
-                                    nn - Nearest Neighbor,\n\
-                                    lf - Linear Filter,\n\
-                                    cf - Cubic Filter,\n\
-                                    gf - Gaussian Filter,\n\
-                                    l  - Lanczos3\n")
-                                    .takes_value(true)
-                                    .possible_values(&FILTERS))
-                                .arg(Arg::with_name("resize")
-                                    .short("r")
-                                    .long("resize")
-                                    .value_name("STRING")
-                                    .help("Sets an option for resize. Options are:\n\
-                                    inc - Image size will be increased but not decreased,\n\
-                                    dec - Image size will be decreased but not increased,\n\
-                                    non - Image size will stay unchanged, \
-                                    can be used for converting to another image format\n\
-                                    iod - Image size will be increased or decreased to specified size,\n")
-                                    .takes_value(true)
-                                    .possible_values(&RESIZE_TYPE))
-                                .arg(Arg::with_name("suffix")
-                                    .short("s")
-                                    .long("suffix")
-                                    .value_name("STRING")
-                                    .help("Sets a suffix that will be added to a file name of resized image.")
-                                    .takes_value(true))
-                                .get_matches();
+            .version("0.1.0")
+            .author("Slaven Kuhinek © 2017")
+            .about("\nImage Resize je program za smanjivanje fotografija \
+            koji korisiti naredbeni redak za unos parametara za promjenu veličine fotografija.")
+            .settings(&[
+                AppSettings::WaitOnError,
+                AppSettings::ColorAlways,
+                AppSettings::AllowExternalSubcommands,
+                ])
+            .arg(Arg::with_name("width")
+                .short("W")
+                .long("width")
+                .value_name("NUMBER")
+                .validator(validate_u32)
+                .help("Sets a width of resized image. \
+                Image will be resized proportionaly to this value.")
+                .takes_value(true))
+            .arg(Arg::with_name("height")
+                .short("H")
+                .long("height")
+                .value_name("NUMBER")
+                .validator(validate_u32)
+                .help("Sets a height of resized image. \
+                Image will be resized proportionaly to this value.")
+                .takes_value(true))
+            .arg(Arg::with_name("format")
+                .short("f")
+                .long("format")
+                .value_name("STRING")
+                .help("Sets a format in witch resized image will be saved to a disk. \
+                Accepted format are jpg or png.")
+                .takes_value(true)
+                .possible_values(&SUPPORTED_SAVES))
+            .arg(Arg::with_name("filter")
+                .short("F")
+                .long("filter")
+                .value_name("STRING")
+                .help("Sets an image resize filter. Filters are: \n\
+                nn - Nearest Neighbor,\n\
+                lf - Linear Filter,\n\
+                cf - Cubic Filter,\n\
+                gf - Gaussian Filter,\n\
+                l  - Lanczos3\n")
+                .takes_value(true)
+                .possible_values(&FILTERS))
+            .arg(Arg::with_name("resize")
+                .short("r")
+                .long("resize")
+                .value_name("STRING")
+                .help("Sets an option for resize. Options are:\n\
+                inc - Image size will be increased but not decreased,\n\
+                dec - Image size will be decreased but not increased,\n\
+                non - Image size will stay unchanged, \
+                can be used for converting to another image format\n\
+                iod - Image size will be increased or decreased to specified size,\n")
+                .takes_value(true)
+                .possible_values(&RESIZE_TYPE))
+            .arg(Arg::with_name("suffix")
+                .short("s")
+                .long("suffix")
+                .value_name("STRING")
+                .help("Sets a suffix that will be added to a file name of resized image.")
+                .takes_value(true))
+            .get_matches();
 
         
         let mut job = Job::new();
@@ -110,7 +110,7 @@ impl Arguments {
         if let Some(height) = matches.value_of("height") {
             match height.parse::<u32>() {
                 Ok(h) => job.height = h,
-                Err(_) => unreachable!(),                
+                Err(_) => unreachable!(),
             }
         } 
 
@@ -128,7 +128,7 @@ impl Arguments {
                 "lf" => job.filter = FilterType::Triangle,
                 "cf" => job.filter = FilterType::CatmullRom,
                 "gf" => job.filter = FilterType::Gaussian,
-                "l" => job.filter = FilterType::Lanczos3,                                
+                "l" => job.filter = FilterType::Lanczos3,
                 _ => unreachable!("while matching filters in Arguments::job_from_clap()"),
             }
         } 
@@ -138,7 +138,7 @@ impl Arguments {
                 "inc" => job.resize = ResizeType::Increase,
                 "dec" => job.resize = ResizeType::Decrease,
                 "non" => job.resize = ResizeType::Neither,
-                "iod" => job.resize = ResizeType::Eather,                               
+                "iod" => job.resize = ResizeType::Eather,
                 _ => unreachable!("while resize type in Arguments::job_from_clap()"),
             }
         }
