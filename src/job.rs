@@ -4,6 +4,7 @@ const FORMAT: Format = Format::Jpeg;
 const FILTER: FilterType = FilterType::Nearest;
 const RESIZE: ResizeType = ResizeType::Decrease;
 const SUFFIX: &str = "-m";
+const RENAME_ALL: bool = false;
 
 /// Izlazni format u kojem će biti spremljena slika
 pub enum Format {
@@ -39,6 +40,7 @@ pub struct Job {
     pub filter: FilterType,
     pub resize: ResizeType,
     pub suffix: String,
+    pub rename_all: bool,
 }
 
 pub struct JobBuilder {
@@ -48,6 +50,7 @@ pub struct JobBuilder {
     filter: FilterType,
     resize: ResizeType,
     suffix: String,
+    rename_all: bool,
 }
 
 impl JobBuilder {
@@ -60,6 +63,7 @@ impl JobBuilder {
             filter: FILTER,
             resize: RESIZE,
             suffix: SUFFIX.to_string(),
+            rename_all: RENAME_ALL,
         }
     }
 
@@ -100,7 +104,8 @@ impl JobBuilder {
             height: self.height,
             filter: self.filter,
             resize: self.resize,
-            suffix: self.suffix,            
+            suffix: self.suffix,   
+            rename_all: self.rename_all,         
         }
     }      
 }

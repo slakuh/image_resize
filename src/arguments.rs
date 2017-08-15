@@ -88,9 +88,13 @@ impl Arguments {
                 .value_name("STRING")
                 .help("Sets a suffix that will be added to a file name of resized image.")
                 .takes_value(true))
+            .arg(Arg::with_name("renameall")
+                .short("a")
+                .long("renameall")
+                .help("Creates renamed copies of files that wasn't resized."))
             .get_matches();
 
-        
+
         let mut job = Job::new();
 
         fn validate_u32(v: String) -> Result<(), String> {
@@ -98,21 +102,21 @@ impl Arguments {
                 Ok(_) => Ok(()),
                 Err(_) => Err(String::from("Value must be a number.")),
             }
-        }   
+        }
 
         if let Some(width) = matches.value_of("width") {
             match width.parse::<u32>() {
                 Ok(w) => job.width = w,
                 Err(_) => unreachable!(),
             }
-        } 
+        }
 
         if let Some(height) = matches.value_of("height") {
             match height.parse::<u32>() {
                 Ok(h) => job.height = h,
                 Err(_) => unreachable!(),
             }
-        } 
+        }
 
         if let Some(format) = matches.value_of("format") {
             match format {
@@ -120,7 +124,7 @@ impl Arguments {
                 "png" => job.format = Format::Png,
                 _ => unreachable!("while matching format in Arguments::job_from_clap()"),
             }
-        } 
+        }
 
         if let Some(filter) = matches.value_of("filter") {
             match filter {
@@ -131,7 +135,7 @@ impl Arguments {
                 "l" => job.filter = FilterType::Lanczos3,
                 _ => unreachable!("while matching filters in Arguments::job_from_clap()"),
             }
-        } 
+        }
 
         if let Some(resize) = matches.value_of("resize") {
             match resize {
@@ -146,6 +150,11 @@ impl Arguments {
         if let Some(suffix) = matches.value_of("suffix") {
             job.suffix = suffix.to_string();
         }
+
+        if matches.is_present("renameall") {
+            job.rename_all = true;
+        }
+
         job
     }
 
@@ -154,28 +163,28 @@ impl Arguments {
             job: builder.execute(),
             images: Arguments::image_paths(),
         }
-        
+
     }
 
-    fn image_paths() -> Vec<PathBuf> {        
+    fn image_paths() -> Vec<PathBuf> {
         let mut images: Vec<PathBuf> = Vec::new();
         for argument in env::args().skip(1) {
-            
+
             let path = PathBuf::from(argument);
-            
+
             if path.is_file() {
                 let file_extension = path.extension()
                     .expect("arguments::image_paths()").to_str()
                     .expect("arguments::image_paths()").to_lowercase();
-          
+
                 for item in &SUPPORTED_IMAGES {
                     if item == &file_extension {
                         images.push(path.clone());
-                        
+
                     }
                 }
-                            
-            }          
+
+            }
         }
         images
     }
